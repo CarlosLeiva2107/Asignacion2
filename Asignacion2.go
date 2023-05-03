@@ -1,11 +1,24 @@
+//Asignacion #2
+//Stacy Chacón Argüello\2021022405
+//Carlos Leiva Medaglia\2021032973
+//Funciones desarrolladas de la 1 a la 10
+
 package main
+
+import (
+	"fmt"
+	"math"
+	"time"
+)
+
+//#########################################FUNCIONES DESARROLLADAS############################################
 
 // 1. Función que genera una secuencia de tamaño n con números pseudo-aleatorios.
 func generarPseudoAleatorios(n int, s0 int) []int {
 
-	//Se revisa que la semilla este en el rango dado
+	//Se revisa que la semilla y el n esten en el rango dado
 	if s0 < 11 || s0 > 257 {
-		s0 = 11 //De no ser asi, se le asigna el valor de 11, el menor numero primo
+		return []int{} //De no ser asi, se retorna un arreglo vacio ya que no se cumplio con el rango
 	} else {
 		//Se verifica que sea primo
 		for !esPrimo(s0) {
@@ -28,7 +41,7 @@ func generarPseudoAleatorios(n int, s0 int) []int {
 		//Se verifica que el numero generado este en el rango valido
 		//De esta manera se evitan problemas, como números negativos
 		if 0 <= s0 && s0 <= (m-1) {
-			numeros = append(numeros, (s0 % 100))
+			numeros = append(numeros, (s0 % 100)) //Se hcae modulo 100 para que este en el rango de 0 a 99
 		}
 	}
 	return numeros
@@ -234,7 +247,7 @@ func InsertarNodo(Nodo **ArbolBB, llave int) int {
 // Se retrona un valor booleano (Si se encontro o no la llave) y la cantidad de comparaciones hechas
 func BuscarNodo(Nodo *ArbolBB, llave int) (bool, int) {
 	//Variables para almacenar las comparaciones y si se encontro o no
-	comparaciones := 0
+	comparaciones := 1
 	comparacionesTemp := 0
 	encontrado := false
 
@@ -269,63 +282,166 @@ func BuscarNodo(Nodo *ArbolBB, llave int) (bool, int) {
 	return encontrado, comparaciones //Se retorna las comparaciones y el booleano que indica si se encontro o no
 }
 
+// Funciones complementarias
+// Altura de ABB
+func AlturaArbol(Nodo *ArbolBB) float64 {
+	var altura float64 = 0
+	if Nodo == nil {
+		altura += 0
+	} else {
+		altura += 1 + math.Max(AlturaArbol(Nodo.HijoDer), AlturaArbol(Nodo.HijoIzq))
+	}
+
+	return altura
+}
+
+//#########################################EXPERIMENTOS############################################
+//En el main se realizan 4 experimentos
+// Se usaran 4 valores distintos para n, estos son: 200,1000,3000,5000
+
 func main() {
+
+	//Variables que se usaras a lo largo de los experimentos
+	var n int
+	var arreglo []int
+	var A []int
+	var TS []int
+	var TOS []int
+	var TOQ []int
+	var Abb *ArbolBB
+	var comparaciones int
+	var encontrado bool
+
+	//Variables que se usaran para guardar las estadisticas
+	var Estadisticas_Insertar_Numero []int
+	var Estadisticas_Insertar_Nodo []int
+	var Busqueda_TS [][]int
+	var Busqueda_TOS [][]int
+	var Busqueda_TOQ [][]int
+	var Busqueda_Abb [][]int
 
 	// EXPERIMENTO 1
 	//  n = 200
 
-	//a. Crear arreglo A de tamaño n, se usa s0 = 45 puede ser cualquier valor entre 11 y 257
-	n := 200
-	A := generarPseudoAleatorios(n, 45)
-
+	//a. Crear arreglo A de tamano n
+	n = 200
+	A = generarPseudoAleatorios(n, 45) //Se usa s0=45 puede ser cualquier valor entre 11 y 257
 	//Falta b y c
 	//b.
 	//c.
 
 	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
-	TS := []int{}
+	TS = []int{}
 
 	for i := 0; i < len(A); i++ {
-		insertarNumeros(&TS, A[i])
+		Estadisticas_Insertar_Numero = append(Estadisticas_Insertar_Numero, insertarNumeros(&TS, A[i]))
 	}
 
 	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
-	TOS := A
+	TOS = make([]int, len(A))
+	copy(TOS, A)
 	TOS = ordenarSeleccion(TOS)
 
 	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
-	TOQ := A
+	TOQ = make([]int, len(A))
+	copy(TOQ, A)
 	TOQ = ordenarQuicksort(TOQ)
 
 	//g. Crear arbol Abb, e insertar los elementos de A
 
-	Abb := new(ArbolBB)
+	Abb = new(ArbolBB)
+	InsertarNodo(&Abb, 5)
+	InsertarNodo(&Abb, 7)
+	InsertarNodo(&Abb, 3)
+	InsertarNodo(&Abb, 6)
+	fmt.Println(AlturaArbol(Abb))
+	time.Sleep(time.Second * 10)
 
 	for i := 0; i < len(A); i++ {
-		InsertarNodo(&Abb, A[i])
+		Estadisticas_Insertar_Nodo = append(Estadisticas_Insertar_Nodo, InsertarNodo(&Abb, A[i]))
 	}
 
-	//i. Generar un arreglo con 1000 numeros aleatorios
-	arreglo := generarPseudoAleatorios(1000, 67)
+	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
+	arreglo = generarPseudoAleatorios(100, 45)
 
-	//Buscar numeros en TS
+	//Buscar numeros del arreglo en TS
 	for i := 0; i < len(arreglo); i++ {
-		busqueda_secuencial(TS, arreglo[i])
+		encontrado, comparaciones = busqueda_secuencial(TS, arreglo[i])
+		if encontrado {
+			Busqueda_TS = append(Busqueda_TS, []int{1, comparaciones})
+		} else {
+			Busqueda_TS = append(Busqueda_TS, []int{0, comparaciones})
+		}
+
 	}
 
-	//Buscar numeros en TOS
+	//Buscar numeros del arreglo en TOS
 	for i := 0; i < len(arreglo); i++ {
-		busqueda_binaria(TOS, arreglo[i])
+		encontrado, comparaciones = busqueda_binaria(TOS, arreglo[i])
+		if encontrado {
+			Busqueda_TOS = append(Busqueda_TOS, []int{1, comparaciones})
+		} else {
+			Busqueda_TOS = append(Busqueda_TOS, []int{0, comparaciones})
+		}
 	}
 
-	//Buscar numeros en TOQ
+	//Buscar numeros del arreglo en TOQ
 	for i := 0; i < len(arreglo); i++ {
-		busqueda_binaria(TOS, arreglo[i])
+		encontrado, comparaciones = busqueda_binaria(TOS, arreglo[i])
+		if encontrado {
+			Busqueda_TOQ = append(Busqueda_TOQ, []int{1, comparaciones})
+		} else {
+			Busqueda_TOQ = append(Busqueda_TOQ, []int{0, comparaciones})
+		}
 	}
 
-	//Buscar numeros en Abb
+	//Buscar numeros del arreglo en Abb
 	for i := 0; i < len(arreglo); i++ {
-		BuscarNodo(Abb, arreglo[i])
+		encontrado, comparaciones = BuscarNodo(Abb, arreglo[i])
+		if encontrado {
+			Busqueda_Abb = append(Busqueda_Abb, []int{1, comparaciones})
+		} else {
+			Busqueda_Abb = append(Busqueda_Abb, []int{0, comparaciones})
+		}
+	}
+
+	//ESTADISTICAS
+
+	//Altura de Abb
+
+	fmt.Println(AlturaArbol(Abb))
+
+	//Densidad de Abb
+
+	//Cantidad total de comparaciones realizadas en las inserciones sobre TS y Abb
+
+	//Cantidad total de comparaciones realizadas en las búsquedas sobre TS, TOS, TOQ y Abb
+
+	for i := 0; i < len(arreglo); i++ {
+		fmt.Println("Valor:", arreglo[i])
+		if Busqueda_TS[i][0] == 1 {
+			fmt.Println("Busqueda en TS: Encontrado =", true, "Comparaciones =", Busqueda_TS[i][1])
+		} else {
+			fmt.Println("Busqueda en TS: Encontrado =", false, "Comparaciones =", Busqueda_TS[i][1])
+		}
+
+		if Busqueda_TOS[i][0] == 1 {
+			fmt.Println("Busqueda en TOS: Encontrado =", true, "Comparaciones =", Busqueda_TOS[i][1])
+		} else {
+			fmt.Println("Busqueda en TOS: Encontrado =", false, "Comparaciones =", Busqueda_TOS[i][1])
+		}
+
+		if Busqueda_TOQ[i][0] == 1 {
+			fmt.Println("Busqueda en TOQ: Encontrado =", true, "Comparaciones =", Busqueda_TOQ[i][1])
+		} else {
+			fmt.Println("Busqueda en TOQ: Encontrado =", false, "Comparaciones =", Busqueda_TOQ[i][1])
+		}
+
+		if Busqueda_Abb[i][0] == 1 {
+			fmt.Println("Busqueda en Abb: Encontrado =", true, "Comparaciones =", Busqueda_Abb[i][1])
+		} else {
+			fmt.Println("Busqueda en Abb: Encontrado =", false, "Comparaciones =", Busqueda_Abb[i][1])
+		}
 	}
 
 }
