@@ -1,15 +1,6 @@
-//Asignacion 2 Programada en Go
-//Carlos Leiva Medaglia 2021032973
-//Stacy Chacón Argüello 2021022405
-
 package main
 
-import (
-	"fmt"
-)
-
 // 1. Función que genera una secuencia de tamaño n con números pseudo-aleatorios.
-// (Falta convertir los numeros en el rango 00 a 99)
 func generarPseudoAleatorios(n int, s0 int) []int {
 
 	//Se revisa que la semilla este en el rango dado
@@ -37,7 +28,7 @@ func generarPseudoAleatorios(n int, s0 int) []int {
 		//Se verifica que el numero generado este en el rango valido
 		//De esta manera se evitan problemas, como números negativos
 		if 0 <= s0 && s0 <= (m-1) {
-			numeros = append(numeros, (s0))
+			numeros = append(numeros, (s0 % 100))
 		}
 	}
 	return numeros
@@ -203,57 +194,138 @@ func busqueda_binaria(arreglo []int, llave int) (bool, int) {
 // 8. Diseñar una representación para un Árbol Binario de Búsqueda
 // Se usan las estructuras de Golang para definir la estructura del arbol de busqueda binario
 type ArbolBB struct {
-	numero  int      //Se define variable quie guardara valor entero
+	numero  int      //Se define variable que guardara valor entero
 	HijoIzq *ArbolBB //Se define un puntero a una estructura de tipo Arbol que sera nodo izquierdo
 	HijoDer *ArbolBB //Se define un puntero a una estructura de tipo Arbol que sera nodo izquierdo
 }
 
+// 9. Funcion que realiza la insercion de un valor entero en un Arbol Binario de Busqueda
+// Se retorna la cantidad de comparaciones realizadas hasta cuando se inserto o no
+func InsertarNodo(Nodo **ArbolBB, llave int) int {
+	comparaciones := 1 //Variable donde se almacenan las comparaciones
+
+	//En caso de que el nodo este nulo, se inserta la llave en el arbol
+	if *Nodo == nil {
+		*Nodo = new(ArbolBB)
+		(*Nodo).numero = llave
+		(*Nodo).HijoDer = nil
+		(*Nodo).HijoIzq = nil
+	} else {
+		//En caso de que la llave ya existe, no se inserta y se retorna las comparaciones
+		if llave == (*Nodo).numero {
+			return comparaciones
+		} else {
+			if llave > (*Nodo).numero {
+				//Si la llave es mayor al la llave del nodo actual
+				// Se vuelve a llamar la funcion ahora recorriendo el hijo derecho
+				comparaciones += InsertarNodo(&(*Nodo).HijoDer, llave)
+			} else {
+				//Si la llave es mayor al la llave del nodo actual
+				// Se vuelve a llamar la funcion ahora recorriendo el hijo derecho
+				comparaciones += InsertarNodo(&(*Nodo).HijoIzq, llave)
+			}
+		}
+	}
+
+	return comparaciones //Se retorna las comparaciones
+}
+
+// 10. Funcion que realiza la busqueda de una llave en un Arbol Binario de Busqueda
+// Se retrona un valor booleano (Si se encontro o no la llave) y la cantidad de comparaciones hechas
+func BuscarNodo(Nodo *ArbolBB, llave int) (bool, int) {
+	//Variables para almacenar las comparaciones y si se encontro o no
+	comparaciones := 0
+	comparacionesTemp := 0
+	encontrado := false
+
+	//En caso de que el nodo este nulo significa que se recorrio y no se encontro
+	if Nodo == nil {
+		return encontrado, comparaciones
+	} else {
+
+		comparacionesTemp++ //Las comparaciones temporales aumentan en 1
+
+		//Si la llave es igual a la llave del nodo actual significa que si se encontro
+		if llave == Nodo.numero {
+			encontrado = true
+			return encontrado, comparaciones
+		} else {
+			if llave > Nodo.numero {
+				//Si la llave es mayor al la llave del nodo actual
+				// Se vuelve a llamar la funcion ahora recorriendo el hijo derecho
+				// A las comparaciones se le suma las comparaciones temporales que tendran guardadas las comparaciones totales
+				encontrado, comparacionesTemp = BuscarNodo(Nodo.HijoDer, llave)
+				comparaciones += comparacionesTemp
+
+			} else {
+				//Si la llave es mayor al la llave del nodo actual
+				// Se vuelve a llamar la funcion ahora recorriendo el hijo izquierdo
+				// A las comparaciones se le suma las comparaciones temporales que tendran guardadas las comparaciones totales
+				encontrado, comparacionesTemp = BuscarNodo(Nodo.HijoIzq, llave)
+				comparaciones += comparacionesTemp
+			}
+		}
+	}
+	return encontrado, comparaciones //Se retorna las comparaciones y el booleano que indica si se encontro o no
+}
+
 func main() {
 
-	//Probando Funcion 1
-	fmt.Println("Funcion 1")
-	s := 257
-	n := 10
-	arreglo := generarPseudoAleatorios(n, s)
-	fmt.Println(arreglo) //Muestra los valores generados
+	// EXPERIMENTO 1
+	//  n = 200
 
-	//Probando Funcion 2
-	fmt.Println("Funcion 2")
-	graficoBarras(arreglo)
+	//a. Crear arreglo A de tamaño n, se usa s0 = 45 puede ser cualquier valor entre 11 y 257
+	n := 200
+	A := generarPseudoAleatorios(n, 45)
 
-	//Probando Funcion 3
-	fmt.Println("Funcion 3")
-	arreglo = []int{1, 2, 3, 4, 5}
-	fmt.Println(insertarNumeros(&arreglo, 6)) //Muestra cantidad de comparaciones realizadas
-	fmt.Println(arreglo)                      //Muestra el arreglo con el numero 6 agregado
-	fmt.Println(insertarNumeros(&arreglo, 3)) //Muestra cantidad de comparaciones realizadas
-	fmt.Println(arreglo)                      //Se muestra el arreglo sin modificaciones
+	//Falta b y c
+	//b.
+	//c.
 
-	//Probando Funcion 4
-	fmt.Println("Funcion 4")
-	arreglo = []int{64, 25, 12, 22, 11, 39, 50, 31, 42, 19}
-	fmt.Println(arreglo) //Muestra el arreglo desordenado
-	arreglo = ordenarSeleccion(arreglo)
-	fmt.Println(arreglo) //Muestra el arreglo ordenado
+	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
+	TS := []int{}
 
-	//Probando Funcion 5
-	fmt.Println("Funcion 5")
-	arreglo = []int{30, 25, 12, 22, 11, 39, 50, 31, 42, 19}
-	fmt.Println(arreglo) //Muestra el arreglo desordenado
-	arreglo = ordenarQuicksort(arreglo)
-	fmt.Println(arreglo) //Muestra el arreglo ordenado
+	for i := 0; i < len(A); i++ {
+		insertarNumeros(&TS, A[i])
+	}
 
-	//Probando Funcion 6
-	fmt.Println("Funcion 6")
-	arreglo = []int{30, 25, 12, 22, 11, 39, 50, 31, 42, 19}
-	encontrado, comparaciones := busqueda_secuencial(arreglo, 39)
-	fmt.Println(encontrado, comparaciones) //Muestra si se encontro y las comparaciones hechas
+	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
+	TOS := A
+	TOS = ordenarSeleccion(TOS)
 
-	//Probando Funcion 7
-	fmt.Println("Probando Funcion 7")
-	arreglo = []int{0, 2, 4, 5, 6, 7, 8, 9, 13, 27}
-	encontrado, comparaciones = busqueda_binaria(arreglo, 13)
-	fmt.Println(encontrado, comparaciones) //Muestra si se encontro y las comparaciones hechas
+	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
+	TOQ := A
+	TOQ = ordenarQuicksort(TOQ)
 
-	//Diseño del Árbol Binario de Búsqueda Arriba, en el punto 8
+	//g. Crear arbol Abb, e insertar los elementos de A
+
+	Abb := new(ArbolBB)
+
+	for i := 0; i < len(A); i++ {
+		InsertarNodo(&Abb, A[i])
+	}
+
+	//i. Generar un arreglo con 1000 numeros aleatorios
+	arreglo := generarPseudoAleatorios(1000, 67)
+
+	//Buscar numeros en TS
+	for i := 0; i < len(arreglo); i++ {
+		busqueda_secuencial(TS, arreglo[i])
+	}
+
+	//Buscar numeros en TOS
+	for i := 0; i < len(arreglo); i++ {
+		busqueda_binaria(TOS, arreglo[i])
+	}
+
+	//Buscar numeros en TOQ
+	for i := 0; i < len(arreglo); i++ {
+		busqueda_binaria(TOS, arreglo[i])
+	}
+
+	//Buscar numeros en Abb
+	for i := 0; i < len(arreglo); i++ {
+		BuscarNodo(Abb, arreglo[i])
+	}
+
 }
