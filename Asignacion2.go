@@ -216,7 +216,6 @@ type ArbolBB struct {
 // Se retorna la cantidad de comparaciones realizadas hasta cuando se inserto o no
 func InsertarNodo(Nodo **ArbolBB, llave int) int {
 	comparaciones := 1 //Variable donde se almacenan las comparaciones
-
 	//En caso de que el nodo este nulo, se inserta la llave en el arbol
 	if *Nodo == nil {
 		*Nodo = new(ArbolBB)
@@ -285,14 +284,30 @@ func BuscarNodo(Nodo *ArbolBB, llave int) (bool, int) {
 // Funciones complementarias
 // Altura de ABB
 func AlturaArbol(Nodo *ArbolBB) float64 {
-	var altura float64 = 0
+	//Si esta vacio se retorna 0
 	if Nodo == nil {
-		altura += 0
+		return 0
 	} else {
-		altura += 1 + math.Max(AlturaArbol(Nodo.HijoDer), AlturaArbol(Nodo.HijoIzq))
+		//Se le suma uno al maximo de entre la altura del hijo izquierdo y el derecho
+		return 1 + math.Max(AlturaArbol(Nodo.HijoIzq), AlturaArbol(Nodo.HijoDer))
 	}
+}
 
-	return altura
+// Tamaño de Abb
+func sizeArbol(Nodo *ArbolBB) float64 {
+	//Si esta vacio se retorna 0
+	if Nodo == nil {
+		return 0
+	} else {
+		//Se le suma uno al tamaño del hijo izquierdo y el hijo derecho
+		return 1 + sizeArbol(Nodo.HijoIzq) + sizeArbol(Nodo.HijoDer)
+	}
+}
+
+// Densidad de ABB
+func DensidadArbol(Nodo *ArbolBB) float64 {
+	//Se divida el tamaño entre la altura
+	return sizeArbol(Nodo) / AlturaArbol(Nodo)
 }
 
 //#########################################EXPERIMENTOS############################################
@@ -326,11 +341,13 @@ func main() {
 	//a. Crear arreglo A de tamano n
 	n = 200
 	A = generarPseudoAleatorios(n, 45) //Se usa s0=45 puede ser cualquier valor entre 11 y 257
+
 	//Falta b y c
 	//b.
 	//c.
 
 	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
+	//Recoger estadisticas
 	TS = []int{}
 
 	for i := 0; i < len(A); i++ {
@@ -350,19 +367,14 @@ func main() {
 	//g. Crear arbol Abb, e insertar los elementos de A
 
 	Abb = new(ArbolBB)
-	InsertarNodo(&Abb, 5)
-	InsertarNodo(&Abb, 7)
-	InsertarNodo(&Abb, 3)
-	InsertarNodo(&Abb, 6)
-	fmt.Println(AlturaArbol(Abb))
-	time.Sleep(time.Second * 10)
+	Abb = nil
 
 	for i := 0; i < len(A); i++ {
 		Estadisticas_Insertar_Nodo = append(Estadisticas_Insertar_Nodo, InsertarNodo(&Abb, A[i]))
 	}
 
 	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
-	arreglo = generarPseudoAleatorios(100, 45)
+	arreglo = generarPseudoAleatorios(10000, 45)
 
 	//Buscar numeros del arreglo en TS
 	for i := 0; i < len(arreglo); i++ {
@@ -413,12 +425,29 @@ func main() {
 
 	//Densidad de Abb
 
+	fmt.Println(DensidadArbol(Abb))
+
+	time.Sleep(time.Second * 5)
+
+	//Juntas
 	//Cantidad total de comparaciones realizadas en las inserciones sobre TS y Abb
+
+	for i := 0; i < len(A); i++ {
+		fmt.Println("Posicion:", i, "Valor:", arreglo[i])
+
+		fmt.Println("Inserciones realizadas en TS para el valor:", Estadisticas_Insertar_Numero[i])
+
+		fmt.Println("Inserciones realizadas en Abb para el valor:", Estadisticas_Insertar_Nodo[i])
+
+	}
+
+	time.Sleep(time.Second * 5)
 
 	//Cantidad total de comparaciones realizadas en las búsquedas sobre TS, TOS, TOQ y Abb
 
 	for i := 0; i < len(arreglo); i++ {
-		fmt.Println("Valor:", arreglo[i])
+		fmt.Println("Posicion:", i, "Valor:", arreglo[i])
+
 		if Busqueda_TS[i][0] == 1 {
 			fmt.Println("Busqueda en TS: Encontrado =", true, "Comparaciones =", Busqueda_TS[i][1])
 		} else {
