@@ -8,7 +8,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"time"
 )
 
 //#########################################FUNCIONES DESARROLLADAS############################################
@@ -325,152 +324,528 @@ func main() {
 	var TOQ []int
 	var Abb *ArbolBB
 	var comparaciones int
+	var comparacionesTemp int
 	var encontrado bool
-
-	//Variables que se usaran para guardar las estadisticas
-	var Estadisticas_Insertar_Numero []int
-	var Estadisticas_Insertar_Nodo []int
-	var Busqueda_TS [][]int
-	var Busqueda_TOS [][]int
-	var Busqueda_TOQ [][]int
-	var Busqueda_Abb [][]int
+	fmt.Println(encontrado) //Ignorar
 
 	// EXPERIMENTO 1
 	//  n = 200
+	fmt.Println("EXPERIMENTO 1")
 
-	//a. Crear arreglo A de tamano n
+	//a. Crear arreglo A de tamaño n
+	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=200")
 	n = 200
 	A = generarPseudoAleatorios(n, 45) //Se usa s0=45 puede ser cualquier valor entre 11 y 257
+	fmt.Println("Arreglo A generado:")
+	fmt.Println(A)
+	fmt.Println("Fin Punto A")
 
+	
 	//Falta b y c
 	//b.
 	//c.
 
-	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
-	//Recoger estadisticas
-	TS = []int{}
 
+	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
+	fmt.Println("Inicio Punto D: Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion")
+	TS = []int{}
+	comparaciones = 0
 	for i := 0; i < len(A); i++ {
-		Estadisticas_Insertar_Numero = append(Estadisticas_Insertar_Numero, insertarNumeros(&TS, A[i]))
+		comparaciones += insertarNumeros(&TS, A[i])
 	}
+	fmt.Println("Arreglo TS generado:")
+	fmt.Println(TS)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Fin Punto D")
+
+
 
 	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
+	fmt.Println("Inicio Punto E: En un arreglo TOS copiar elementos de A y ordenarlos por seleccion")
 	TOS = make([]int, len(A))
 	copy(TOS, A)
 	TOS = ordenarSeleccion(TOS)
+	fmt.Println("Arreglo TOS Ordenado:")
+	fmt.Println(TOS)
+	fmt.Println("Fin Punto E")
+
+
 
 	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
+	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
 	TOQ = make([]int, len(A))
 	copy(TOQ, A)
 	TOQ = ordenarQuicksort(TOQ)
+	fmt.Println("Arreglo TOQ Ordenado:")
+	fmt.Println(TOQ)
+	fmt.Println("Fin Punto F")
+
+
 
 	//g. Crear arbol Abb, e insertar los elementos de A
-
+	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
 	Abb = new(ArbolBB)
 	Abb = nil
-
+	comparaciones = 0
 	for i := 0; i < len(A); i++ {
-		Estadisticas_Insertar_Nodo = append(Estadisticas_Insertar_Nodo, InsertarNodo(&Abb, A[i]))
+		comparaciones += InsertarNodo(&Abb, A[i])
 	}
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Fin Punto G")
+
+
 
 	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
+	fmt.Println("Inicio Punto I: Crear arreglo con 10000 numeros y buscar los numeros en TS,TOS,TOQ,Abb")
 	arreglo = generarPseudoAleatorios(10000, 45)
 
 	//Buscar numeros del arreglo en TS
+	comparaciones = 0
+	comparacionesTemp = 0
 	for i := 0; i < len(arreglo); i++ {
-		encontrado, comparaciones = busqueda_secuencial(TS, arreglo[i])
-		if encontrado {
-			Busqueda_TS = append(Busqueda_TS, []int{1, comparaciones})
-		} else {
-			Busqueda_TS = append(Busqueda_TS, []int{0, comparaciones})
-		}
-
+		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
+		comparaciones += comparacionesTemp
 	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
+
 
 	//Buscar numeros del arreglo en TOS
+	comparaciones = 0
+	comparacionesTemp = 0
 	for i := 0; i < len(arreglo); i++ {
-		encontrado, comparaciones = busqueda_binaria(TOS, arreglo[i])
-		if encontrado {
-			Busqueda_TOS = append(Busqueda_TOS, []int{1, comparaciones})
-		} else {
-			Busqueda_TOS = append(Busqueda_TOS, []int{0, comparaciones})
-		}
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
 	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
+
 
 	//Buscar numeros del arreglo en TOQ
+	comparaciones = 0
+	comparacionesTemp = 0
 	for i := 0; i < len(arreglo); i++ {
-		encontrado, comparaciones = busqueda_binaria(TOS, arreglo[i])
-		if encontrado {
-			Busqueda_TOQ = append(Busqueda_TOQ, []int{1, comparaciones})
-		} else {
-			Busqueda_TOQ = append(Busqueda_TOQ, []int{0, comparaciones})
-		}
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
 	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
+
 
 	//Buscar numeros del arreglo en Abb
+	comparaciones = 0
+	comparacionesTemp = 0
 	for i := 0; i < len(arreglo); i++ {
-		encontrado, comparaciones = BuscarNodo(Abb, arreglo[i])
-		if encontrado {
-			Busqueda_Abb = append(Busqueda_Abb, []int{1, comparaciones})
-		} else {
-			Busqueda_Abb = append(Busqueda_Abb, []int{0, comparaciones})
-		}
+		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
+		comparaciones += comparacionesTemp
 	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
 
-	//ESTADISTICAS
+
 
 	//Altura de Abb
-
+	fmt.Println("Altura de Abb")
 	fmt.Println(AlturaArbol(Abb))
 
 	//Densidad de Abb
-
+	fmt.Println("Densidad de Abb")
 	fmt.Println(DensidadArbol(Abb))
 
-	time.Sleep(time.Second * 5)
 
-	//Juntas
-	//Cantidad total de comparaciones realizadas en las inserciones sobre TS y Abb
 
+
+
+
+
+
+
+
+	// EXPERIMENTO 2
+	//  n = 1000
+	fmt.Println("EXPERIMENTO 2")
+
+	//a. Crear arreglo A de tamaño n
+	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=1000")
+	n = 1000
+	A = generarPseudoAleatorios(n, 45) //Se usa s0=45 puede ser cualquier valor entre 11 y 257
+	fmt.Println("Arreglo A generado:")
+	fmt.Println(A)
+	fmt.Println("Fin Punto A")
+
+	
+	//Falta b y c
+	//b.
+	//c.
+
+
+	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
+	fmt.Println("Inicio Punto D: Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion")
+	TS = []int{}
+	comparaciones = 0
 	for i := 0; i < len(A); i++ {
-		fmt.Println("Posicion:", i, "Valor:", arreglo[i])
-
-		fmt.Println("Inserciones realizadas en TS para el valor:", Estadisticas_Insertar_Numero[i])
-
-		fmt.Println("Inserciones realizadas en Abb para el valor:", Estadisticas_Insertar_Nodo[i])
-
+		comparaciones += insertarNumeros(&TS, A[i])
 	}
+	fmt.Println("Arreglo TS generado:")
+	fmt.Println(TS)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Fin Punto D")
 
-	time.Sleep(time.Second * 5)
 
-	//Cantidad total de comparaciones realizadas en las búsquedas sobre TS, TOS, TOQ y Abb
 
+	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
+	fmt.Println("Inicio Punto E: En un arreglo TOS copiar elementos de A y ordenarlos por seleccion")
+	TOS = make([]int, len(A))
+	copy(TOS, A)
+	TOS = ordenarSeleccion(TOS)
+	fmt.Println("Arreglo TOS Ordenado:")
+	fmt.Println(TOS)
+	fmt.Println("Fin Punto E")
+
+
+
+	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
+	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
+	TOQ = make([]int, len(A))
+	copy(TOQ, A)
+	TOQ = ordenarQuicksort(TOQ)
+	fmt.Println("Arreglo TOQ Ordenado:")
+	fmt.Println(TOQ)
+	fmt.Println("Fin Punto F")
+
+
+
+	//g. Crear arbol Abb, e insertar los elementos de A
+	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
+	Abb = new(ArbolBB)
+	Abb = nil
+	comparaciones = 0
+	for i := 0; i < len(A); i++ {
+		comparaciones += InsertarNodo(&Abb, A[i])
+	}
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Fin Punto G")
+
+
+
+	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
+	fmt.Println("Inicio Punto I: Crear arreglo con 10000 numeros y buscar los numeros en TS,TOS,TOQ,Abb")
+	arreglo = generarPseudoAleatorios(10000, 45)
+
+	//Buscar numeros del arreglo en TS
+	comparaciones = 0
+	comparacionesTemp = 0
 	for i := 0; i < len(arreglo); i++ {
-		fmt.Println("Posicion:", i, "Valor:", arreglo[i])
-
-		if Busqueda_TS[i][0] == 1 {
-			fmt.Println("Busqueda en TS: Encontrado =", true, "Comparaciones =", Busqueda_TS[i][1])
-		} else {
-			fmt.Println("Busqueda en TS: Encontrado =", false, "Comparaciones =", Busqueda_TS[i][1])
-		}
-
-		if Busqueda_TOS[i][0] == 1 {
-			fmt.Println("Busqueda en TOS: Encontrado =", true, "Comparaciones =", Busqueda_TOS[i][1])
-		} else {
-			fmt.Println("Busqueda en TOS: Encontrado =", false, "Comparaciones =", Busqueda_TOS[i][1])
-		}
-
-		if Busqueda_TOQ[i][0] == 1 {
-			fmt.Println("Busqueda en TOQ: Encontrado =", true, "Comparaciones =", Busqueda_TOQ[i][1])
-		} else {
-			fmt.Println("Busqueda en TOQ: Encontrado =", false, "Comparaciones =", Busqueda_TOQ[i][1])
-		}
-
-		if Busqueda_Abb[i][0] == 1 {
-			fmt.Println("Busqueda en Abb: Encontrado =", true, "Comparaciones =", Busqueda_Abb[i][1])
-		} else {
-			fmt.Println("Busqueda en Abb: Encontrado =", false, "Comparaciones =", Busqueda_Abb[i][1])
-		}
+		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
+		comparaciones += comparacionesTemp
 	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
+
+
+	//Buscar numeros del arreglo en TOS
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
+
+
+	//Buscar numeros del arreglo en TOQ
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
+
+
+	//Buscar numeros del arreglo en Abb
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
+	fmt.Println("Fin Punto I")
+
+
+
+	//Altura de Abb
+	fmt.Println("Altura de Abb")
+	fmt.Println(AlturaArbol(Abb))
+
+	//Densidad de Abb
+	fmt.Println("Densidad de Abb")
+	fmt.Println(DensidadArbol(Abb))
+
+
+
+
+
+
+
+
+
+
+	// EXPERIMENTO 3
+	//  n = 3000
+	fmt.Println("EXPERIMENTO 3")
+
+	//a. Crear arreglo A de tamaño n
+	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=3000")
+	n = 3000
+	A = generarPseudoAleatorios(n, 45) //Se usa s0=45 puede ser cualquier valor entre 11 y 257
+	fmt.Println("Arreglo A generado:")
+	fmt.Println(A)
+	fmt.Println("Fin Punto A")
+
+	
+	//Falta b y c
+	//b.
+	//c.
+
+
+	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
+	fmt.Println("Inicio Punto D: Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion")
+	TS = []int{}
+	comparaciones = 0
+	for i := 0; i < len(A); i++ {
+		comparaciones += insertarNumeros(&TS, A[i])
+	}
+	fmt.Println("Arreglo TS generado:")
+	fmt.Println(TS)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Fin Punto D")
+
+
+
+	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
+	fmt.Println("Inicio Punto E: En un arreglo TOS copiar elementos de A y ordenarlos por seleccion")
+	TOS = make([]int, len(A))
+	copy(TOS, A)
+	TOS = ordenarSeleccion(TOS)
+	fmt.Println("Arreglo TOS Ordenado:")
+	fmt.Println(TOS)
+	fmt.Println("Fin Punto E")
+
+
+
+	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
+	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
+	TOQ = make([]int, len(A))
+	copy(TOQ, A)
+	TOQ = ordenarQuicksort(TOQ)
+	fmt.Println("Arreglo TOQ Ordenado:")
+	fmt.Println(TOQ)
+	fmt.Println("Fin Punto F")
+
+
+
+	//g. Crear arbol Abb, e insertar los elementos de A
+	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
+	Abb = new(ArbolBB)
+	Abb = nil
+	comparaciones = 0
+	for i := 0; i < len(A); i++ {
+		comparaciones += InsertarNodo(&Abb, A[i])
+	}
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Fin Punto G")
+
+
+
+	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
+	fmt.Println("Inicio Punto I: Crear arreglo con 10000 numeros y buscar los numeros en TS,TOS,TOQ,Abb")
+	arreglo = generarPseudoAleatorios(10000, 45)
+
+	//Buscar numeros del arreglo en TS
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
+
+
+	//Buscar numeros del arreglo en TOS
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
+
+
+	//Buscar numeros del arreglo en TOQ
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
+
+
+	//Buscar numeros del arreglo en Abb
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
+	fmt.Println("Fin Punto I")
+
+
+
+	//Altura de Abb
+	fmt.Println("Altura de Abb")
+	fmt.Println(AlturaArbol(Abb))
+
+	//Densidad de Abb
+	fmt.Println("Densidad de Abb")
+	fmt.Println(DensidadArbol(Abb))
+
+
+
+
+
+
+
+
+
+
+	// EXPERIMENTO 4
+	//  n = 5000
+	fmt.Println("EXPERIMENTO 4")
+
+	//a. Crear arreglo A de tamaño n
+	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=5000")
+	n = 5000
+	A = generarPseudoAleatorios(n, 45) //Se usa s0=45 puede ser cualquier valor entre 11 y 257
+	fmt.Println("Arreglo A generado:")
+	fmt.Println(A)
+	fmt.Println("Fin Punto A")
+
+	
+	//Falta b y c
+	//b.
+	//c.
+
+
+	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
+	fmt.Println("Inicio Punto D: Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion")
+	TS = []int{}
+	comparaciones = 0
+	for i := 0; i < len(A); i++ {
+		comparaciones += insertarNumeros(&TS, A[i])
+	}
+	fmt.Println("Arreglo TS generado:")
+	fmt.Println(TS)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Fin Punto D")
+
+
+
+	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
+	fmt.Println("Inicio Punto E: En un arreglo TOS copiar elementos de A y ordenarlos por seleccion")
+	TOS = make([]int, len(A))
+	copy(TOS, A)
+	TOS = ordenarSeleccion(TOS)
+	fmt.Println("Arreglo TOS Ordenado:")
+	fmt.Println(TOS)
+	fmt.Println("Fin Punto E")
+
+
+
+	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
+	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
+	TOQ = make([]int, len(A))
+	copy(TOQ, A)
+	TOQ = ordenarQuicksort(TOQ)
+	fmt.Println("Arreglo TOQ Ordenado:")
+	fmt.Println(TOQ)
+	fmt.Println("Fin Punto F")
+
+
+
+	//g. Crear arbol Abb, e insertar los elementos de A
+	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
+	Abb = new(ArbolBB)
+	Abb = nil
+	comparaciones = 0
+	for i := 0; i < len(A); i++ {
+		comparaciones += InsertarNodo(&Abb, A[i])
+	}
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Fin Punto G")
+
+
+
+	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
+	fmt.Println("Inicio Punto I: Crear arreglo con 10000 numeros y buscar los numeros en TS,TOS,TOQ,Abb")
+	arreglo = generarPseudoAleatorios(10000, 45)
+
+	//Buscar numeros del arreglo en TS
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
+
+
+	//Buscar numeros del arreglo en TOS
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
+
+
+	//Buscar numeros del arreglo en TOQ
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
+
+
+	//Buscar numeros del arreglo en Abb
+	comparaciones = 0
+	comparacionesTemp = 0
+	for i := 0; i < len(arreglo); i++ {
+		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
+		comparaciones += comparacionesTemp
+	}
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
+	fmt.Println("Fin Punto I")
+
+
+
+	//Altura de Abb
+	fmt.Println("Altura de Abb")
+	fmt.Println(AlturaArbol(Abb))
+
+	//Densidad de Abb
+	fmt.Println("Densidad de Abb")
+	fmt.Println(DensidadArbol(Abb))
+
 
 }
+
+
+
+
+
+
+
+
+	
