@@ -8,6 +8,10 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
+	"strconv"
+
+	"github.com/wcharczuk/go-chart"
 )
 
 //#########################################FUNCIONES DESARROLLADAS############################################
@@ -58,7 +62,44 @@ func esPrimo(s int) bool {
 
 // 2. Función que genera un gráfico de barras a partir de un arreglo de tamaño n.
 // (Falta, no se si es generarlo mediante libreria en una interfaz o en consola)
-func graficoBarras(arreglo []int) {
+func graficoBarras(arreglo []int, experimento int) {
+
+	//Asignar colores de fondo para el grafico
+	chart.DefaultCanvasColor = chart.ColorWhite
+	chart.DefaultBackgroundColor = chart.ColorWhite
+
+	var barras []chart.Value //Variable para almacenar los valores de cada barra
+	//Se recorre el arreglo y se agregara en las barras el indice y el numero que ese indice contenga
+	for i := 0; i < len(arreglo); i++ {
+		barras = append(barras, chart.Value{
+			Label: strconv.Itoa(i),
+			Value: float64(arreglo[i]),
+		})
+	}
+
+	//Se crea la variable que contendra la informacion para generar el grafico
+	//Esta variable tendra alamacenada informacion como el tirulo, el estilo, el ancho y la altura del grafico
+	//Asi como tambien tendra la variable que tiene el valor para cada barra
+	Grafico := chart.BarChart{
+		Title: "Bar Chart",
+		TitleStyle: chart.Style{
+			FontColor: chart.ColorBlack,
+			FontSize:  35,
+			Show:      true,
+		},
+		Width:    55 * len(arreglo),
+		Height:   500,
+		XAxis:    chart.StyleShow(),
+		YAxis:    chart.YAxis{Style: chart.StyleShow()},
+		Bars:     barras,
+		BarWidth: 40,
+	}
+
+	//Se crea un archivo llamado Experimento(Numero de experimento).png
+	//En este archivo png se renderizara el grafico y se podra visualizar en este archivo
+	f, _ := os.Create("Experimento" + strconv.Itoa(experimento) + ".png")
+	defer f.Close()
+	Grafico.Render(chart.PNG, f)
 }
 
 // 3. Función que hace la inserción de un valor entero en un arreglo de numeros enteros.
@@ -319,6 +360,7 @@ func main() {
 	var n int
 	var arreglo []int
 	var A []int
+	var Distr []int
 	var TS []int
 	var TOS []int
 	var TOQ []int
@@ -332,6 +374,7 @@ func main() {
 	//  n = 200
 	fmt.Println("EXPERIMENTO 1")
 
+
 	//a. Crear arreglo A de tamaño n
 	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=200")
 	n = 200
@@ -340,10 +383,21 @@ func main() {
 	fmt.Println(A)
 	fmt.Println("Fin Punto A")
 
-	
-	//Falta b y c
-	//b.
-	//c.
+
+	//b. Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1
+	fmt.Println("Inicio Punto B: Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1")
+	Distr = make([]int, 100)
+	for i := 0; i < len(A); i++ {
+		Distr[A[i]] += 1
+	}
+	fmt.Println(Distr)
+	fmt.Println("Fin Punto B")
+
+
+	//c.Graficar Distr
+	fmt.Println("Inicio Punto C:Graficar arreglo Distr")
+	graficoBarras(Distr, 1)
+	fmt.Println("Fin Punto C")
 
 
 	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
@@ -355,9 +409,8 @@ func main() {
 	}
 	fmt.Println("Arreglo TS generado:")
 	fmt.Println(TS)
-	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:", comparaciones)
 	fmt.Println("Fin Punto D")
-
 
 
 	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
@@ -370,7 +423,6 @@ func main() {
 	fmt.Println("Fin Punto E")
 
 
-
 	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
 	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
 	TOQ = make([]int, len(A))
@@ -381,7 +433,6 @@ func main() {
 	fmt.Println("Fin Punto F")
 
 
-
 	//g. Crear arbol Abb, e insertar los elementos de A
 	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
 	Abb = new(ArbolBB)
@@ -390,9 +441,8 @@ func main() {
 	for i := 0; i < len(A); i++ {
 		comparaciones += InsertarNodo(&Abb, A[i])
 	}
-	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:", comparaciones)
 	fmt.Println("Fin Punto G")
-
 
 
 	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
@@ -406,8 +456,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOS
 	comparaciones = 0
@@ -416,8 +465,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOQ
 	comparaciones = 0
@@ -426,8 +474,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:", comparaciones)
 
 	//Buscar numeros del arreglo en Abb
 	comparaciones = 0
@@ -436,9 +483,7 @@ func main() {
 		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
-
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:", comparaciones)
 
 	//Altura de Abb
 	fmt.Println("Altura de Abb")
@@ -447,10 +492,6 @@ func main() {
 	//Densidad de Abb
 	fmt.Println("Densidad de Abb")
 	fmt.Println(DensidadArbol(Abb))
-
-
-
-
 
 
 
@@ -461,6 +502,7 @@ func main() {
 	//  n = 1000
 	fmt.Println("EXPERIMENTO 2")
 
+	
 	//a. Crear arreglo A de tamaño n
 	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=1000")
 	n = 1000
@@ -469,10 +511,21 @@ func main() {
 	fmt.Println(A)
 	fmt.Println("Fin Punto A")
 
-	
-	//Falta b y c
-	//b.
-	//c.
+
+	//b. Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1
+	fmt.Println("Inicio Punto B: Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1")
+	Distr = make([]int, 100)
+	for i := 0; i < len(A); i++ {
+		Distr[A[i]] += 1
+	}
+	fmt.Println(Distr)
+	fmt.Println("Fin Punto B")
+
+
+	//c.Graficar Distr
+	fmt.Println("Inicio Punto C:Graficar arreglo Distr")
+	graficoBarras(Distr, 2)
+	fmt.Println("Fin Punto C")
 
 
 	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
@@ -484,9 +537,8 @@ func main() {
 	}
 	fmt.Println("Arreglo TS generado:")
 	fmt.Println(TS)
-	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:", comparaciones)
 	fmt.Println("Fin Punto D")
-
 
 
 	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
@@ -499,7 +551,6 @@ func main() {
 	fmt.Println("Fin Punto E")
 
 
-
 	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
 	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
 	TOQ = make([]int, len(A))
@@ -510,7 +561,6 @@ func main() {
 	fmt.Println("Fin Punto F")
 
 
-
 	//g. Crear arbol Abb, e insertar los elementos de A
 	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
 	Abb = new(ArbolBB)
@@ -519,9 +569,8 @@ func main() {
 	for i := 0; i < len(A); i++ {
 		comparaciones += InsertarNodo(&Abb, A[i])
 	}
-	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:", comparaciones)
 	fmt.Println("Fin Punto G")
-
 
 
 	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
@@ -535,8 +584,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOS
 	comparaciones = 0
@@ -545,8 +593,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOQ
 	comparaciones = 0
@@ -555,8 +602,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:", comparaciones)
 
 	//Buscar numeros del arreglo en Abb
 	comparaciones = 0
@@ -565,10 +611,8 @@ func main() {
 		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:", comparaciones)
 	fmt.Println("Fin Punto I")
-
-
 
 	//Altura de Abb
 	fmt.Println("Altura de Abb")
@@ -577,10 +621,6 @@ func main() {
 	//Densidad de Abb
 	fmt.Println("Densidad de Abb")
 	fmt.Println(DensidadArbol(Abb))
-
-
-
-
 
 
 
@@ -591,6 +631,7 @@ func main() {
 	//  n = 3000
 	fmt.Println("EXPERIMENTO 3")
 
+
 	//a. Crear arreglo A de tamaño n
 	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=3000")
 	n = 3000
@@ -599,10 +640,21 @@ func main() {
 	fmt.Println(A)
 	fmt.Println("Fin Punto A")
 
-	
-	//Falta b y c
-	//b.
-	//c.
+
+	//b. Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1
+	fmt.Println("Inicio Punto B: Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1")
+	Distr = make([]int, 100)
+	for i := 0; i < len(A); i++ {
+		Distr[A[i]] += 1
+	}
+	fmt.Println(Distr)
+	fmt.Println("Fin Punto B")
+
+
+	//c.Graficar Distr
+	fmt.Println("Inicio Punto C:Graficar arreglo Distr")
+	graficoBarras(Distr, 3)
+	fmt.Println("Fin Punto C")
 
 
 	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
@@ -614,9 +666,8 @@ func main() {
 	}
 	fmt.Println("Arreglo TS generado:")
 	fmt.Println(TS)
-	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:", comparaciones)
 	fmt.Println("Fin Punto D")
-
 
 
 	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
@@ -629,7 +680,6 @@ func main() {
 	fmt.Println("Fin Punto E")
 
 
-
 	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
 	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
 	TOQ = make([]int, len(A))
@@ -640,7 +690,6 @@ func main() {
 	fmt.Println("Fin Punto F")
 
 
-
 	//g. Crear arbol Abb, e insertar los elementos de A
 	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
 	Abb = new(ArbolBB)
@@ -649,9 +698,8 @@ func main() {
 	for i := 0; i < len(A); i++ {
 		comparaciones += InsertarNodo(&Abb, A[i])
 	}
-	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:", comparaciones)
 	fmt.Println("Fin Punto G")
-
 
 
 	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
@@ -665,8 +713,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOS
 	comparaciones = 0
@@ -675,8 +722,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOQ
 	comparaciones = 0
@@ -685,8 +731,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:", comparaciones)
 
 	//Buscar numeros del arreglo en Abb
 	comparaciones = 0
@@ -695,10 +740,8 @@ func main() {
 		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:", comparaciones)
 	fmt.Println("Fin Punto I")
-
-
 
 	//Altura de Abb
 	fmt.Println("Altura de Abb")
@@ -707,10 +750,6 @@ func main() {
 	//Densidad de Abb
 	fmt.Println("Densidad de Abb")
 	fmt.Println(DensidadArbol(Abb))
-
-
-
-
 
 
 
@@ -721,6 +760,7 @@ func main() {
 	//  n = 5000
 	fmt.Println("EXPERIMENTO 4")
 
+
 	//a. Crear arreglo A de tamaño n
 	fmt.Println("Inicio Punto A: Generar arreglo de numeros pseudoaleatorios de tamaño n=5000")
 	n = 5000
@@ -729,10 +769,21 @@ func main() {
 	fmt.Println(A)
 	fmt.Println("Fin Punto A")
 
-	
-	//Falta b y c
-	//b.
-	//c.
+
+	//b. Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1
+	fmt.Println("Inicio Punto B: Crear un arreglo Distr donde cada vez que en A aparezca un numero ese indice aumenta en 1")
+	Distr = make([]int, 100)
+	for i := 0; i < len(A); i++ {
+		Distr[A[i]] += 1
+	}
+	fmt.Println(Distr)
+	fmt.Println("Fin Punto B")
+
+
+	//c.Graficar Distr
+	fmt.Println("Inicio Punto C:Graficar arreglo Distr")
+	graficoBarras(Distr, 4)
+	fmt.Println("Fin Punto C")
 
 
 	//d. Insertar en un arreglo TS los elementos de A mediante algoritmo de insercion
@@ -744,9 +795,8 @@ func main() {
 	}
 	fmt.Println("Arreglo TS generado:")
 	fmt.Println(TS)
-	fmt.Println("Comparaciones totales hechas para las inserciones en TS:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en TS:", comparaciones)
 	fmt.Println("Fin Punto D")
-
 
 
 	//e. Crear arreglo TOS que es una copia de A y ordenarla por seleccion
@@ -759,7 +809,6 @@ func main() {
 	fmt.Println("Fin Punto E")
 
 
-
 	//f. Crear arreglo TOQ que es una copia de A y ordenarla por quicksort
 	fmt.Println("Inicio Punto F: En un arreglo TOQ copiar elementos de A y ordenarlos por quicksort")
 	TOQ = make([]int, len(A))
@@ -770,7 +819,6 @@ func main() {
 	fmt.Println("Fin Punto F")
 
 
-
 	//g. Crear arbol Abb, e insertar los elementos de A
 	fmt.Println("Inicio Punto G: Insertar en un arbol Abb los elementos de A")
 	Abb = new(ArbolBB)
@@ -779,11 +827,10 @@ func main() {
 	for i := 0; i < len(A); i++ {
 		comparaciones += InsertarNodo(&Abb, A[i])
 	}
-	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para las inserciones en Abb:", comparaciones)
 	fmt.Println("Fin Punto G")
 
-
-
+	
 	//i. Generar un arreglo con 10000 numeros aleatorios y guardar las estadisticas
 	fmt.Println("Inicio Punto I: Crear arreglo con 10000 numeros y buscar los numeros en TS,TOS,TOQ,Abb")
 	arreglo = generarPseudoAleatorios(10000, 45)
@@ -795,8 +842,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_secuencial(TS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOS
 	comparaciones = 0
@@ -805,8 +851,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOS:", comparaciones)
 
 	//Buscar numeros del arreglo en TOQ
 	comparaciones = 0
@@ -815,8 +860,7 @@ func main() {
 		encontrado, comparacionesTemp = busqueda_binaria(TOS, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:",comparaciones)
-
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en TOQ:", comparaciones)
 
 	//Buscar numeros del arreglo en Abb
 	comparaciones = 0
@@ -825,10 +869,8 @@ func main() {
 		encontrado, comparacionesTemp = BuscarNodo(Abb, arreglo[i])
 		comparaciones += comparacionesTemp
 	}
-	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:",comparaciones)
+	fmt.Println("Comparaciones totales hechas para la busqueda de valores en Abb:", comparaciones)
 	fmt.Println("Fin Punto I")
-
-
 
 	//Altura de Abb
 	fmt.Println("Altura de Abb")
@@ -838,14 +880,4 @@ func main() {
 	fmt.Println("Densidad de Abb")
 	fmt.Println(DensidadArbol(Abb))
 
-
 }
-
-
-
-
-
-
-
-
-	
